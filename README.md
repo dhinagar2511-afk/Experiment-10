@@ -1,9 +1,10 @@
-# Neural-Network-Keras-on-non-linear-toy-data-make_moons
-## EXPERIMENT - 9
+# Back-propagation-numeric-example-for-single-neuron
+## EXPERIMENT - 10
 
 ## AIM
 
-Train a small feedforward neural network to classify non-linear data. 
+Manually compute forward and backward pass for a single sigmoid neuron and update 
+weights. 
 
 ---
 
@@ -11,7 +12,7 @@ Train a small feedforward neural network to classify non-linear data.
 
 **Brief Algorithm:**
 
-Two-layer dense network with ReLU hidden units and sigmoid output, trained with Adam.
+Compute gradient of cross-entropy loss and update weights via gradient descent.  
 
 ---
 
@@ -20,44 +21,61 @@ Two-layer dense network with ReLU hidden units and sigmoid output, trained with 
 **Run the following program in a Jupyter Notebook code cell:**
 
 ```python
-from tensorflow.keras.models import Sequential 
+import numpy as np 
 
-from tensorflow.keras.layers import Dense 
+# Single sample x, target y 
 
-from sklearn.datasets import make_moons 
+x = np.array([0.5, -1.2]) 
 
-from sklearn.model_selection import train_test_split 
+y = 1.0 
 
-from sklearn.metrics import accuracy_score 
+w = np.array([0.1, -0.2]); b = 0.0 
 
-X,y = make_moons(n_samples=500, noise=0.2, random_state=42) 
+lr = 0.1 
 
-Xtr,Xte,ytr,yte = train_test_split(X,y,test_size=0.2, random_state=42) 
+def sigmoid(z): return 1/(1+np.exp(-z)) 
 
-model = Sequential([Dense(8, activation='relu', input_shape=(2,)), 
+# Forward pass 
 
-Dense(1, activation='sigmoid')]) 
+z = np.dot(w, x) + b 
 
-model.compile(optimizer='adam', loss='binary_crossentropy', 
+a = sigmoid(z) 
 
-metrics=['accuracy']) 
+loss = - (y*np.log(a) + (1-y)*np.log(1-a)) 
 
-model.fit(Xtr, ytr, epochs=30, batch_size=16, verbose=0) 
+# Backward pass (gradients) 
 
-y_pred = (model.predict(Xte) > 0.5).astype(int).flatten() 
+dz = a - y 
 
-print('NN test accuracy:', round(accuracy_score(yte, y_pred),4) 
+dw = dz * x 
+
+db = dz 
+
+# Update weights 
+
+w_new = w - lr * dw 
+
+b_new = b - lr * db 
+
+print('a (output):', round(a,4), 'loss:', round(loss,4)) 
+
+print('dw:', np.round(dw,4), 'db:', round(db,4)) 
+
+print('Updated w:', np.round(w_new,4), 'Updated b:', round(b_new,4)) 
 ```
 
 ---
 
 ## DETAILED EXPLANATION
 
-1. make_moons creates non-linear two-class data. 
-2. Model: Dense(8, relu) hidden layer; Dense(1, sigmoid) output for binary 
-classification. 
-3. compile chooses optimizer & loss; fit trains the network via backpropagation. 
-4. Evaluate on test set using prediction threshold 0.5.
+1. Define input x and target y. 
+2. Initialize weights w and bias b, set learning rate lr. 
+3. sigmoid function computes activation. 
+4. Forward: compute z = w·x + b, a = sigmoid(z). 
+5. Loss: binary cross-entropy (single-sample). 
+6. Backprop: dz = a - y (derivative of loss wrt z for sigmoid+cross-entropy), dw = dz 
+* x, db = dz. 
+7. Weight update: w_new = w - lr * dw.
 ---
 
 ---
@@ -65,15 +83,18 @@ classification.
 ## OUTPUT
 
 ```text
-NN test accuracy: 0.92 
+a (output): 0.4502 loss: 0.8014 
+dw: [-0.275  0.66] db: -0.55 
+Updated w: [0.1275 -0.266] Updated b: 0.055 
 ```
 
 ---
 
 ## RESULT
 
-Neural networks model non-linear boundaries; students see improved accuracy over 
-linear methods. 
+Learners observe numeric gradients and weight updates; demystifies 
+backpropagation. 
 
 ---
 
+ 
